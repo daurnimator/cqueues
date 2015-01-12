@@ -1786,7 +1786,11 @@ static int cqueue_resume(lua_State *L, struct cqueue *Q, struct callinfo *I, str
 		if (LUA_OK != cqueue_update(L, Q))
 			goto error;
 
-		lua_xmove(T->L, L, 1);
+		/* push thread with error onto stack */
+		lua_pushthread(T->L);
+
+		/* move thread and error message to main stack */
+		lua_xmove(T->L, L, 2);
 error:
 		thread_del(L, Q, I, T);
 
@@ -1887,9 +1891,11 @@ static int cqueue_step(lua_State *L) {
 
 	if (LUA_OK != cqueue_process(L, Q, &I)) {
 		lua_pushboolean(L, 0);
-		lua_pushvalue(L, -2);
-
-		return 2;
+		/* push error message */
+		lua_pushvalue(L, -3);
+		/* push thread that failed */
+		lua_pushvalue(L, -3);
+		return 3;
 	} else {
 		lua_pushboolean(L, 1);
 
