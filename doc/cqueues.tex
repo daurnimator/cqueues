@@ -47,12 +47,6 @@ morestring=[b]"
 }{
 }
 
-\lstnewenvironment{example}[1]{
-	\lstset{language=#1,numbers=left,numberstyle=\tiny,stepnumber=2,tabsize=4}
-	\ttfamily\small
-}{
-}
-
 \newcounter{toccols}
 \setcounter{toccols}{2}
 \newenvironment{Module}[1]{
@@ -258,15 +252,15 @@ be a condition variable instead of a function. This permits user code to create 
 
 \subsubsection[\method{object:timeout}]{\method{:timeout()}} The \method{:timeout} should return a number or nil. This schedules an independent timeout event. To effect a simple one second timeout, you can do
 
-\begin{code}{perl}
+\begin{lstlisting}[language=lua]
         cqueues.poll({ timeout = function() return 1.0 end })
-\end{code}
+\end{lstlisting}
 
 which is equivalent to the shortcut
 
-\begin{code}{perl}
+\begin{lstlisting}[language=lua]
 	cqueues.poll(1.0)
-\end{code}
+\end{lstlisting}
 
 Instantiated \cqueues objects implement all three methods.\footnote{\method{:pollfd} returns the internal \syscall{kqueue}, \syscall{epoll}, or Ports descriptor; \method{:events} returns ``r''; and \method{:timeout} returns the time to the next internal timeout event.} In particular, this means that you can stack \cqueues, or poll on a \cqueues object using some other event loop library. Each \cqueues object is entirely self-contained, without any global state.
 
@@ -611,15 +605,15 @@ Both the MIME header and MIME entity reader require a proper terminating conditi
 
 For MIME headers the next line should be non-$nil$ and should not appear to be a prefix of a header.
 
-\begin{example}{lua}
+\begin{lstlisting}[language=lua]
 local function isbreak(ln) -- requires *L, not *l
 	return find(ln, "\n", #ln, true) and not match(ln, "[%w%-_]+%s*:")
 end
-\end{example}
+\end{lstlisting}
 
 For MIME entities the next line should begin with the boundary text.
 
-\begin{example}{lua}
+\begin{lstlisting}[language=lua]
 local function isboundary(marker, ln)
 	local p, pe = find(ln, marker, 1, true)
 
@@ -633,7 +627,7 @@ local function isboundary(marker, ln)
 
 	return false
 end
-\end{example}
+\end{lstlisting}
 
 
 \subsubsection[\fn{socket:write}]{\fn{socket:write(...)}}
@@ -1339,15 +1333,15 @@ Most \cqueues interfaces return a single integer error rather than the Lua-idiom
 
 Serves a similar purpose as \fn{auxlib.assert}, except on error returns $v$ (\nil or \false) followed by the string message and any integer error. For example, in
 
-\begin{example}{lua}
+\begin{lstlisting}[language=lua]
 	local v, why, syserr = fileresult(false, nil, EPERM)
-\end{example}
+\end{lstlisting}
 
 $v$ is \false, $why$ is ``Operation not permitted'', and $syserr$ is EPERM. Whereas with
 
-\begin{example}{lua}
+\begin{lstlisting}[language=lua]
 	local v, why, syserr = fileresult(nil, ``No such file or directory'')
-\end{example}
+\end{lstlisting}
 
 $v$ is \nil, $why$ is ``No such file or directory'', and $syserr$ is \nil.
 
@@ -1378,7 +1372,7 @@ Note that unlike \fn{cqueues:wrap}, the created coroutine is not attached to a c
 
 \section{HTTP SSL Request}
 
-\begin{example}{lua}
+\begin{lstlisting}[language=lua]
 local cqueues = require"cqueues"
 local socket = require"cqueues.socket"
 
@@ -1410,13 +1404,13 @@ cq:wrap(function()
 end)
 
 assert(cq:loop())
-\end{example}
+\end{lstlisting}
 
 
 \clearpage
 \section{Multiplexing Echo Server}
 
-\begin{example}{lua}
+\begin{lstlisting}[language=lua]
 local cqueues = require"cqueues"
 local socket = require"cqueues.socket"
 local bind, port, wait = ...
@@ -1438,12 +1432,12 @@ cq:wrap(function()
 end)
 
 assert(cq:loop())
-\end{example}
+\end{lstlisting}
 
 \clearpage
 \section{Thread Messaging}
 
-\begin{example}{lua}
+\begin{lstlisting}[language=lua]
 local cqueues = require"cqueues"
 local thread = require"cqueues.thread"
 
@@ -1483,7 +1477,7 @@ cq:wrap(function()
 end)
 
 assert(cq:loop())
-\end{example}
+\end{lstlisting}
 
 
 

@@ -276,12 +276,15 @@ The <span>`:timeout` </span> should return a number or nil. This
 schedules an independent timeout event. To effect a simple one second
 timeout, you can do
 
-<span>perl</span> cqueues.poll(<span> timeout = function() return 1.0
-end </span>)
+``` {language="lua"}
+        cqueues.poll({ timeout = function() return 1.0 end })
+```
 
 which is equivalent to the shortcut
 
-<span>perl</span> cqueues.poll(1.0)
+``` {language="lua"}
+    cqueues.poll(1.0)
+```
 
 Instantiated <span>`cqueues` </span>objects implement all three
 methods.[^4] In particular, this means that you can stack
@@ -863,19 +866,29 @@ processing the stream.
 For MIME headers the next line should be non-$nil$ and should not appear
 to be a prefix of a header.
 
-<span>lua</span> local function isbreak(ln) – requires \*L, not \*l
-return find(ln, “”, \#ln, true) and not match(ln, "[end
+``` {language="lua"}
+local function isbreak(ln) -- requires *L, not *l
+    return find(ln, "\n", #ln, true) and not match(ln, "[%w%-_]+%s*:")
+end
+```
 
 For MIME entities the next line should begin with the boundary text.
 
-<span>lua</span> local function isboundary(marker, ln) local p, pe =
-find(ln, marker, 1, true)
+``` {language="lua"}
+local function isboundary(marker, ln)
+    local p, pe = find(ln, marker, 1, true)
 
-if p == 1 then if find(ln, “^^??$", pe + 1) then
+    if p == 1 then
+        if find(ln, "^\r?\n?$", pe + 1) then
             return "begin"
-        elseif find(ln, "^--\r?\n?$”, pe + 1) then return “end” end end
+        elseif find(ln, "^--\r?\n?$", pe + 1) then
+            return "end"
+        end
+    end
 
-return false end
+    return false
+end
+```
 
 #### <span>`socket:write(...)` </span>
 
@@ -1869,13 +1882,16 @@ Serves a similar purpose as <span>`auxlib.assert` </span>, except on
 error returns $v$ (<span>`nil` </span>or <span>`false` </span>) followed
 by the string message and any integer error. For example, in
 
-<span>lua</span> local v, why, syserr = fileresult(false, nil, EPERM)
+``` {language="lua"}
+    local v, why, syserr = fileresult(false, nil, EPERM)
+```
 
 $v$ is <span>`false` </span>, $why$ is “Operation not permitted”, and
 $syserr$ is EPERM. Whereas with
 
-<span>lua</span> local v, why, syserr = fileresult(nil, “No such file or
-directory”)
+``` {language="lua"}
+    local v, why, syserr = fileresult(nil, ``No such file or directory'')
+```
 
 $v$ is <span>`nil` </span>, $why$ is “No such file or directory”, and
 $syserr$ is <span>`nil` </span>.
@@ -1918,73 +1934,111 @@ Examples
 HTTP SSL Request
 ----------------
 
-<span>lua</span> local cqueues = require“cqueues” local socket =
-require“cqueues.socket”
+``` {language="lua"}
+local cqueues = require"cqueues"
+local socket = require"cqueues.socket"
 
-local http = socket.connect(“google.com”, 443)
+local http = socket.connect("google.com", 443)
 
 local cq = cqueues.new()
 
-cq:wrap(function() http:starttls()
+cq:wrap(function()
+    http:starttls()
 
-http:write(“GET / HTTP/1.0”) http:write(“Host: google.com:443”)
+    http:write("GET / HTTP/1.0\n")
+    http:write("Host: google.com:443\n\n")
 
-local status = http:read() print(“!”, status)
+    local status = http:read()
+    print("!", status)
 
-for ln in http:lines“\*h” do print(“|”, ln) end
+    for ln in http:lines"*h" do
+        print("|", ln)
+    end
 
-local empty = http:read“\*L” print“ ”
+    local empty = http:read"*L"
+    print"~"
 
-for ln in http:lines“\*L” do io.stdout:write(ln) end
+    for ln in http:lines"*L" do
+        io.stdout:write(ln)
+    end
 
-http:close() end)
+    http:close()
+end)
 
 assert(cq:loop())
+```
 
 Multiplexing Echo Server
 ------------------------
 
-<span>lua</span> local cqueues = require“cqueues” local socket =
-require“cqueues.socket” local bind, port, wait = ...
+``` {language="lua"}
+local cqueues = require"cqueues"
+local socket = require"cqueues.socket"
+local bind, port, wait = ...
 
-local srv = socket.listen(bind or “127.0.0.1”, tonumber(port or 8000))
+local srv = socket.listen(bind or "127.0.0.1", tonumber(port or 8000))
 
 local cq = cqueues.new()
 
-cq:wrap(function() for con in srv:clients(wait) do cq:wrap(function()
-for ln in con:lines(“\*L”) do cq:write(ln) end
+cq:wrap(function()
+    for con in srv:clients(wait) do
+        cq:wrap(function()
+            for ln in con:lines("*L") do
+                cq:write(ln)
+            end
 
-cq:shutdown(“w”) end) end end)
+            cq:shutdown("w")
+        end)
+    end
+end)
 
 assert(cq:loop())
+```
 
 Thread Messaging
 ----------------
 
-<span>lua</span> local cqueues = require“cqueues” local thread =
-require“cqueues.thread”
+``` {language="lua"}
+local cqueues = require"cqueues"
+local thread = require"cqueues.thread"
 
-– we start a thread and pass two parameters–‘0’ and ’9’ local thr, con =
-thread.start(function(con, i, j) – the ‘cqueues’ upvalue defined above
-is gone local cqueues = require“cqueues” local cq = cqueues.new()
+-- we start a thread and pass two parameters--`0' and '9'
+local thr, con = thread.start(function(con, i, j)
+    -- the `cqueues' upvalue defined above is gone
+    local cqueues = require"cqueues"
+    local cq = cqueues.new()
 
-cq:wrap(function() for n = tonumber(i), tonumber(j) do
-io.stdout:write(“sent ”, n, “”) con:write(n, “”) – sleep so our stdout
-writes don’t mix cqueues.sleep(0.1) end end)
+    cq:wrap(function()
+        for n = tonumber(i), tonumber(j) do
+            io.stdout:write("sent ", n, "\n")
+            con:write(n, "\n")
+             -- sleep so our stdout writes don't mix
+            cqueues.sleep(0.1)
+        end
+    end)
 
-assert(cq:loop()) end, 0, 9)
+    assert(cq:loop())
+end, 0, 9)
+
 
 local cq = cqueues.new()
 
-cq:wrap(function() for ln in con:lines() do io.stdout:write(ln, “ rcvd”,
-“”) end
+cq:wrap(function()
+    for ln in con:lines() do
+        io.stdout:write(ln, " rcvd", "\n")
+    end
 
-local ok, why = thr:join()
+    local ok, why = thr:join()
 
-if ok then print(why or “OK”) else
-error(require“cqueues.errno”.strerror(why)) end end)
+    if ok then
+        print(why or "OK")
+    else
+        error(require"cqueues.errno".strerror(why))
+    end
+end)
 
 assert(cq:loop())
+```
 
 [^1]: I have been toying with the idea of using an fd\_set in-place of a
     pollable descriptor on Windows, and taking the union of all fd\_sets
