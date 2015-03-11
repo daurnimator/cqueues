@@ -324,7 +324,7 @@ Cancels the specified descriptor for all controllers. This ensures safe early cl
 
 Any coroutine polling on the canceled descriptor is placed on its controller's pending queue.
 
-\subsubsection[\routine{cqueues.poll}]{\routine{cqueues.poll($\ldots$)}}
+\subsubsection[\routine{cqueues.poll}]{\routine{cqueues.poll(…)}}
 Takes a series of objects obeying the polling protocol and yields control to the parent \cqueues controller. On an event resumes the coroutine, passing the objects which triggered resumption. A number value is interpreted as a timeout.
 
 \subsubsection[\routine{cqueues.sleep}]{\routine{cqueues.sleep(number)}}
@@ -378,7 +378,7 @@ Returns a count of managed coroutines.
 \subsubsection[\routine{cqueues:cancel}]{\routine{cqueue:cancel(fd)}}
 Cancel the specified descriptor for that controller. See cqueues.cancel.
 
-\subsubsection[\routine{cqueues:pause}]{\routine{cqueue:pause(signal [, signal $\ldots$ ])}}
+\subsubsection[\routine{cqueues:pause}]{\routine{cqueue:pause(signal [, signal … ])}}
 A wrapper around \syscall{pselect} which \emph{suspends execution of the process} until the controller polls ready or a signal is delivered. This interface is provided as a very basic least common denominator for simple slave process controller loops and similar scenarios, where immediate response to signal delivery is required on platforms like Solaris without a proper signal polling primitive. (\routine{signal.listen} on Solaris merely periodically queries the pending set.)
 
 Much better alternatives are possible for Solaris, but require global process state or an LWP thread helper.
@@ -404,7 +404,7 @@ Add or interpose a socket class method. Returns the previous method, if any.
 \subsubsection[\fn{socket.connect}]{\fn{socket.connect(host, port [, family] [, type])}}
 Return a new socket immediately ready for reading or writing. DNS lookup and TCP connection handling are handled transparently.
 
-\subsubsection[\fn{socket.connect}]{\fn{socket.connect\{ $\ldots$ \}}}
+\subsubsection[\fn{socket.connect}]{\fn{socket.connect\{ … \}}}
 Like \fn{socket.connect} with list arguments, but takes a table of named arguments:
 
 \begin{ctabular}{r | c | p{4.5in}}
@@ -455,7 +455,7 @@ field & type:default & description\\\hline
 \subsubsection[\fn{socket.listen}]{\fn{socket.listen(host, port)}}
 	Return a new socket immediately ready for accepting connections.
 
-\subsubsection[\fn{socket.listen}]{\fn{socket.listen\{ $\ldots$ \}}}
+\subsubsection[\fn{socket.listen}]{\fn{socket.listen\{ … \}}}
 	Like \fn{socket.listen} with list arguments, but takes a table of named arguments. See also \fn{socket.connect\{\}}.
 
 \subsubsection[\fn{socket.pair}]{\fn{socket.pair([type])}}
@@ -732,19 +732,19 @@ Returns string returned by strsignal(3).
 \subsubsection[\fn{signal.ignore}]{\fn{signal.ignore(signal [, signal $\ldots $ ])}}
 Set the signal handler to SIG\_IGN for the specified signals.
 
-\subsubsection[\fn{signal.default}]{\fn{signal.default(signal [, signal $\ldots$ ])}}
+\subsubsection[\fn{signal.default}]{\fn{signal.default(signal [, signal … ])}}
 Set the signal handler to SIG\_DFL for the specified signals.
 
-\subsubsection[\fn{signal.discard}]{\fn{signal.discard(signal [, signal $\ldots$ ])}}
+\subsubsection[\fn{signal.discard}]{\fn{signal.discard(signal [, signal … ])}}
 Set the signal handler to a builtin ``noop'' handler for the specified signals. Use this is you want signals to interrupt syscalls.
 
-\subsubsection[\fn{signal.block}]{\fn{signal.block(signal [, signal $\ldots$ ])}}
+\subsubsection[\fn{signal.block}]{\fn{signal.block(signal [, signal … ])}}
 Block the specified signals.
 
-\subsubsection[\fn{signal.unblock}]{\fn{signal.unblock(signal [, signal $\ldots$ ])}}
+\subsubsection[\fn{signal.unblock}]{\fn{signal.unblock(signal [, signal … ])}}
 Unblock the specified signals.
 
-\subsubsection[\fn{signal.raise}]{\fn{signal.raise(signal [, signal $\ldots$ ])}}
+\subsubsection[\fn{signal.raise}]{\fn{signal.raise(signal [, signal … ])}}
 raise(3) the specified signals.
 
 \subsubsection[\routine{signal.type}]{\routine{signal.type(obj)}}
@@ -753,7 +753,7 @@ Return the string ``signal listener'' if $obj$ is a signal listener object, or $
 \subsubsection[\fn{signal.interpose}]{\fn{signal.interpose(name, function)}}
 Add or interpose a signal listener class method. Returns the previous method, if any.
 
-\subsubsection[\fn{signal.listen}]{\fn{signal.listen(signal [, signal $\ldots$ ])}}
+\subsubsection[\fn{signal.listen}]{\fn{signal.listen(signal [, signal … ])}}
 Returns a signal listener object for the specified signals. Semantics differ between platforms:
 
 \paragraph{kqueue}
@@ -787,7 +787,7 @@ Return the string ``thread'' if $obj$ is a thread object, or $nil$ otherwise.
 \subsubsection[\fn{thread.self}]{\fn{thread.self()}}
 Returns the LWP thread object for the running Lua instances. Threads not started via thread.start return nil.
 
-\subsubsection[\fn{thread.start}]{\fn{thread.start(function [, string [, string $\ldots$ ]])}}
+\subsubsection[\fn{thread.start}]{\fn{thread.start(function [, string [, string … ]])}}
 Generates a socket pair, starts a POSIX LWP thread, initializes a new Lua VM instance, preloads the \cqueues library, and loads and executes the specified function from the new LWP thread and Lua instance. The function receives as the first parameter one end of the socket pair---instantiated as a \module{cqueues.socket} object---followed by the string parameters passed to thread.start.
 
 The new LWP thread starts with all signals blocked.
@@ -828,7 +828,7 @@ ALL    & bitwise-or of CREATE, DELETE, ATTRIB, MODIFY, and REVOKE
 %IN\_CLOEXEC & foo \\
 \end{tabular}
 
-\subsubsection[\fn{notify.flags}]{\fn{notify.flags(bitset[, bitset $\ldots$ ])}}
+\subsubsection[\fn{notify.flags}]{\fn{notify.flags(bitset[, bitset … ])}}
 
 Returns an iterator over the flags in the specified bitwise change sets. Thus, \texttt{notify.flags(bit32.xor(notify.CREATE, notify.DELETE), notify.MODIFY)} returns an iterator returning all three flags.
 
@@ -975,7 +975,7 @@ field & type & description\\\hline
 
 Returns a count of records in the sections specified by the bitwise parameter `sections'. Defaults to \texttt{packet.section.ALL}, which is the XOR of all four sections.
 
-\subsubsection[\fn{packet:grep}]{\fn{packet:grep\{ $\ldots$ \}}}
+\subsubsection[\fn{packet:grep}]{\fn{packet:grep\{ … \}}}
 
 Returns a record iterator over the packet according to all the criteria specified by the optional table parameter.
 
@@ -1016,7 +1016,7 @@ Return the string ``dns config'' if $obj$ is a config object, or $nil$ otherwise
 
 Add or interpose a config class method. Returns the previous method, if any.
 
-\subsubsection[\fn{config.new}]{\fn{config.new\{ $\ldots$ \}}}
+\subsubsection[\fn{config.new}]{\fn{config.new\{ … \}}}
 
 Returns a new config object, optionally initialized according to the specified table values.
 
@@ -1036,11 +1036,11 @@ field & type & description\\\hline
 ..tcp & number & see TCP\_ENABLE, TCP\_ONLY, TCP\_DISABLE in \fn{config[]}\\
 .interface & string & IP address to bind to when querying (e.g. [192.168.1.1]:1234)
 \end{ctabular}
-\subsubsection[\fn{config.stub}]{\fn{config.stub\{ $\ldots$ \}}}
+\subsubsection[\fn{config.stub}]{\fn{config.stub\{ … \}}}
 
 Returns a config object initialized for a stub resolver by loading the relevant system files; e.g. /etc/resolv.conf and /etc/nsswitch.conf. Takes optional initialization values like \fn{config.new}.
 
-\subsubsection[\fn{config.root}]{\fn{config.root\{ $\ldots$ \}}}
+\subsubsection[\fn{config.root}]{\fn{config.root\{ … \}}}
 
 Returns a config object initialized for a recursive resolver. Takes optional initialization values like \fn{config.new}.
 
@@ -1056,7 +1056,7 @@ Like :loadfile, but takes a file path.
 
 Returns the configuration as a Lua table structure. See \fn{config.new} for a description of the values.
 
-\subsubsection[\fn{config:set}]{\fn{config:set\{ $\ldots$ \}}}
+\subsubsection[\fn{config:set}]{\fn{config:set\{ … \}}}
 
 Apply the defined configuration values. The table should have the same structure as described for \fn{config.new}.
 
@@ -1154,11 +1154,11 @@ Add or interpose a resolver class method. Returns the previous method, if any.
 
 Returns a new resolver object, configured according to the specified config, hosts, and hints objects. `resconf' can be either an object, or a table suitable for passing to \fn{config.new}. `hosts' and `hints', if nil, are instantiated according to the mode---recursive or stub---of the config object.
 
-\subsubsection[\fn{resolver.stub}]{\fn{resolver.stub\{ $\ldots$ \}}}
+\subsubsection[\fn{resolver.stub}]{\fn{resolver.stub\{ … \}}}
 
 Returns a stub resolver, optionally initialized to the defined config parameters, which should have a structure suitable for passing to \fn{cqueues.dns.config.new}.
 
-\subsubsection[\fn{resolver.root}]{\fn{resolver.root\{ $\ldots$ \}}}
+\subsubsection[\fn{resolver.root}]{\fn{resolver.root\{ … \}}}
 
 Returns a recursive resolver, optionally initialized to the defined config parameters, which should have a structure suitable for passing to \fn{cqueues.dns.config.new}.
 
@@ -1213,11 +1213,11 @@ Return the string ``dns resolver pool'' if $obj$ is a resolver pool object, or $
 
 Behaves similar to \fn{resolver:new}. Returns a new resolver pool object.
 
-\subsubsection[\fn{resolvers.stub}]{\fn{resolvers.stub\{ $\ldots$ \}}}
+\subsubsection[\fn{resolvers.stub}]{\fn{resolvers.stub\{ … \}}}
 
 Returns a stub resolver pool, with each resolver optionally initialized to the defined config parameters, which should have a structure suitable for passing to \fn{cqueues.dns.config.new}.
 
-\subsubsection[\fn{resolvers.root}]{\fn{resolvers.root\{ $\ldots$ \}}}
+\subsubsection[\fn{resolvers.root}]{\fn{resolvers.root\{ … \}}}
 
 Returns a recursive resolver pool, with each resolver optionally initialized to the defined config parameters, which should have a structure suitable for passing to \fn{cqueues.dns.config.new}.
 
@@ -1257,7 +1257,7 @@ in LIFO order, otherwise in FIFO order.
 
 Note that the \cqueues scheduler might schedule execution of multiple woken threads in a different order. The LIFO/FIFO behavior is most useful when implementing a mutex and for whatever reason you wish to select the thread which has waited either the longest or shortest amount of time.
 
-\subsubsection[\fn{condition:wait}]{\fn{condition:wait([$\ldots$])}}
+\subsubsection[\fn{condition:wait}]{\fn{condition:wait([…])}}
 
 Wait on the condition variable. Additional arguments are yielded to the \cqueues controller for polling. Passing an integer, for example, allows you to effect a timeout. Passing a socket allows you to wait on both the condition variable and the socket.
 
@@ -1282,7 +1282,7 @@ The promise object uses a condition variable to wakeup any coroutines waiting in
 
 Returns the string ``promise'' if $obj$ is a promise, or $nil$ otherwise.
 
-\subsubsection[\fn{promise.new}]{\fn{promise.new([$f$[, $\ldots$]])}}
+\subsubsection[\fn{promise.new}]{\fn{promise.new([$f$[, …]])}}
 
 Returns a new promise object. $f$ is an optional function to run asynchronously, to which any subsequent arguments are passed. $f$ is called using \fn{pcall}, and the return values of \fn{pcall} are passed directly to \fn{promise:set}.
 
@@ -1290,7 +1290,7 @@ Returns a new promise object. $f$ is an optional function to run asynchronously,
 
 Returns ``pending'' if the promise is yet unresolved, ``fulfilled'' if the promise has been resolved (\fn{promise:get} will return the values), or ``rejected'' if the promise failed (\fn{promise:get} will throw an error).
 
-\subsubsection[\fn{promise:set}]{\fn{promise:set($ok$[, $\ldots$])}}
+\subsubsection[\fn{promise:set}]{\fn{promise:set($ok$[, …])}}
 
 Resolves the state of the promise object. If $ok$ is \true then any subsequent arguments will be returned to \fn{promise:get} callers. If $ok$ is \false then an error will be thrown to \fn{promise:get} callers, with the error value taken from the first subsequent argument, if any.
 
@@ -1315,7 +1315,7 @@ Returns a condition variable suitable for polling which is used to signal resolu
 
 The auxiliary module exposes some convenience interfaces, including some interfaces to help with application integration or for dealing with quirky behavior that hasn't yet been changed because of API stability concerns.
 
-\subsubsection[\fn{auxlib.assert}]{\fn{auxlib.assert($v$ [$\ldots$])}}
+\subsubsection[\fn{auxlib.assert}]{\fn{auxlib.assert($v$ […])}}
 
 Similar to Lua's built-in \fn{assert}, except that when $v$ is false searches the argument list for the first non-nil, non-false value to use as the message. If the message is an integer, applies \fn{errno.strerror} to derive a human readable string.
 
@@ -1324,7 +1324,7 @@ This routine can be explicitly monkey patched to be the global \fn{assert}.
 Most \cqueues interfaces return a single integer error rather than the Lua-idiomatic string followed by an integer error. The original concern was that most ``errors'' would be EAGAIN, ETIMEDOUT, or EPIPE, which occur very often and would be costly to continually copy onto the stack as strings, especially given that they'd normally be discarded. In the future the plan is to revert to the idiomatic return protocol used by Lua's \fn{file} API, but memoize the more common errno string representations using upvalues so they can be efficiently returned.
 
 
-\subsubsection[\fn{auxlib.fileresult}]{\fn{auxlib.fileresult($v$ [$\ldots$])}}
+\subsubsection[\fn{auxlib.fileresult}]{\fn{auxlib.fileresult($v$ […])}}
 
 Serves a similar purpose as \fn{auxlib.assert}, except on error returns $v$ (\nil or \false) followed by the string message and any integer error. For example, in
 
@@ -1340,7 +1340,7 @@ $v$ is \false, $why$ is ``Operation not permitted'', and $syserr$ is EPERM. Wher
 
 $v$ is \nil, $why$ is ``No such file or directory'', and $syserr$ is \nil.
 
-\subsubsection[\fn{auxlib.resume}]{\fn{auxlib.resume($co$ [$\ldots$])}}
+\subsubsection[\fn{auxlib.resume}]{\fn{auxlib.resume($co$ […])}}
 
 Similar to Lua's built-in \fn{coroutine.resume}, except that when coroutines yield using \fn{cqueues.poll} recursively yields up the stack until the controller is reached, and then silently restart the coroutine when the poll operation completes. This permits creating iterators which can transparently yield. The application must be careful to ensure that this wrapper is used at every point in a yield/resume chain to get the automatic behavior.
 

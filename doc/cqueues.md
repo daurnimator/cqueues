@@ -272,7 +272,7 @@ Cancels the specified descriptor for all controllers. This ensures safe early cl
 
 Any coroutine polling on the canceled descriptor is placed on its controller’s pending queue.
 
-#### <span>`cqueues.poll(\ldots)` </span>
+#### <span>`cqueues.poll(…)` </span>
 
 Takes a series of objects obeying the polling protocol and yields control to the parent <span>`cqueues` </span>controller. On an event resumes the coroutine, passing the objects which triggered resumption. A number value is interpreted as a timeout.
 
@@ -332,7 +332,7 @@ Returns a count of managed coroutines.
 
 Cancel the specified descriptor for that controller. See cqueues.cancel.
 
-#### <span>`cqueue:pause(signal [, signal \ldots ])` </span>
+#### <span>`cqueue:pause(signal [, signal … ])` </span>
 
 A wrapper around <span>`pselect` </span> which *suspends execution of the process* until the controller polls ready or a signal is delivered. This interface is provided as a very basic least common denominator for simple slave process controller loops and similar scenarios, where immediate response to signal delivery is required on platforms like Solaris without a proper signal polling primitive. (<span>`signal.listen` </span> on Solaris merely periodically queries the pending set.)
 
@@ -360,7 +360,7 @@ Add or interpose a socket class method. Returns the previous method, if any.
 
 Return a new socket immediately ready for reading or writing. DNS lookup and TCP connection handling are handled transparently.
 
-#### <span>`socket.connect{ \ldots }` </span>
+#### <span>`socket.connect{ … }` </span>
 
 Like <span>`socket.connect` </span> with list arguments, but takes a table of named arguments:
 
@@ -408,7 +408,7 @@ Like <span>`socket.connect` </span> with list arguments, but takes a table of na
 
 Return a new socket immediately ready for accepting connections.
 
-#### <span>`socket.listen{ \ldots }` </span>
+#### <span>`socket.listen{ … }` </span>
 
 Like <span>`socket.listen` </span> with list arguments, but takes a table of named arguments. See also <span>`socket.connect{}` </span>.
 
@@ -708,23 +708,23 @@ Returns string returned by strsignal(3).
 
 Set the signal handler to SIG\_IGN for the specified signals.
 
-#### <span>`signal.default(signal [, signal \ldots ])` </span>
+#### <span>`signal.default(signal [, signal … ])` </span>
 
 Set the signal handler to SIG\_DFL for the specified signals.
 
-#### <span>`signal.discard(signal [, signal \ldots ])` </span>
+#### <span>`signal.discard(signal [, signal … ])` </span>
 
 Set the signal handler to a builtin “noop” handler for the specified signals. Use this is you want signals to interrupt syscalls.
 
-#### <span>`signal.block(signal [, signal \ldots ])` </span>
+#### <span>`signal.block(signal [, signal … ])` </span>
 
 Block the specified signals.
 
-#### <span>`signal.unblock(signal [, signal \ldots ])` </span>
+#### <span>`signal.unblock(signal [, signal … ])` </span>
 
 Unblock the specified signals.
 
-#### <span>`signal.raise(signal [, signal \ldots ])` </span>
+#### <span>`signal.raise(signal [, signal … ])` </span>
 
 raise(3) the specified signals.
 
@@ -736,7 +736,7 @@ Return the string “signal listener” if $obj$ is a signal listener object, or
 
 Add or interpose a signal listener class method. Returns the previous method, if any.
 
-#### <span>`signal.listen(signal [, signal \ldots ])` </span>
+#### <span>`signal.listen(signal [, signal … ])` </span>
 
 Returns a signal listener object for the specified signals. Semantics differ between platforms:
 
@@ -776,7 +776,7 @@ Return the string “thread” if $obj$ is a thread object, or $nil$ otherwise.
 
 Returns the LWP thread object for the running Lua instances. Threads not started via thread.start return nil.
 
-#### <span>`thread.start(function [, string [, string \ldots ]])` </span>
+#### <span>`thread.start(function [, string [, string … ]])` </span>
 
 Generates a socket pair, starts a POSIX LWP thread, initializes a new Lua VM instance, preloads the <span>`cqueues` </span>library, and loads and executes the specified function from the new LWP thread and Lua instance. The function receives as the first parameter one end of the socket pair—instantiated as a <span>`cqueues.socket` </span> object—followed by the string parameters passed to thread.start.
 
@@ -807,7 +807,7 @@ A table mapping bitwise flags to names, and vice-versa.
    DELETE  file deletion event
     ALL    bitwise-or of CREATE, DELETE, ATTRIB, MODIFY, and REVOKE
 
-#### <span>`notify.flags(bitset[, bitset \ldots ])` </span>
+#### <span>`notify.flags(bitset[, bitset … ])` </span>
 
 Returns an iterator over the flags in the specified bitwise change sets. Thus, `notify.flags(bit32.xor(notify.CREATE, notify.DELETE), notify.MODIFY)` returns an iterator returning all three flags.
 
@@ -946,7 +946,7 @@ Returns a table of packet header flags.
 
 Returns a count of records in the sections specified by the bitwise parameter ‘sections’. Defaults to `packet.section.ALL`, which is the XOR of all four sections.
 
-#### <span>`packet:grep{ \ldots }` </span>
+#### <span>`packet:grep{ … }` </span>
 
 Returns a record iterator over the packet according to all the criteria specified by the optional table parameter.
 
@@ -983,7 +983,7 @@ Return the string “dns config” if $obj$ is a config object, or $nil$ otherwi
 
 Add or interpose a config class method. Returns the previous method, if any.
 
-#### <span>`config.new{ \ldots }` </span>
+#### <span>`config.new{ … }` </span>
 
 Returns a new config object, optionally initialized according to the specified table values.
 
@@ -1002,11 +1002,11 @@ Returns a new config object, optionally initialized according to the specified t
 ..tcp & number & see TCP\_ENABLE, TCP\_ONLY, TCP\_DISABLE in <span>`config[]` </span>\
 .interface & string & IP address to bind to when querying (e.g. [192.168.1.1]:1234)
 
-#### <span>`config.stub{ \ldots }` </span>
+#### <span>`config.stub{ … }` </span>
 
 Returns a config object initialized for a stub resolver by loading the relevant system files; e.g. /etc/resolv.conf and /etc/nsswitch.conf. Takes optional initialization values like <span>`config.new` </span>.
 
-#### <span>`config.root{ \ldots }` </span>
+#### <span>`config.root{ … }` </span>
 
 Returns a config object initialized for a recursive resolver. Takes optional initialization values like <span>`config.new` </span>.
 
@@ -1022,7 +1022,7 @@ Like :loadfile, but takes a file path.
 
 Returns the configuration as a Lua table structure. See <span>`config.new` </span> for a description of the values.
 
-#### <span>`config:set{ \ldots }` </span>
+#### <span>`config:set{ … }` </span>
 
 Apply the defined configuration values. The table should have the same structure as described for <span>`config.new` </span>.
 
@@ -1114,11 +1114,11 @@ Add or interpose a resolver class method. Returns the previous method, if any.
 
 Returns a new resolver object, configured according to the specified config, hosts, and hints objects. ‘resconf’ can be either an object, or a table suitable for passing to <span>`config.new` </span>. ‘hosts’ and ‘hints’, if nil, are instantiated according to the mode—recursive or stub—of the config object.
 
-#### <span>`resolver.stub{ \ldots }` </span>
+#### <span>`resolver.stub{ … }` </span>
 
 Returns a stub resolver, optionally initialized to the defined config parameters, which should have a structure suitable for passing to <span>`cqueues.dns.config.new` </span>.
 
-#### <span>`resolver.root{ \ldots }` </span>
+#### <span>`resolver.root{ … }` </span>
 
 Returns a recursive resolver, optionally initialized to the defined config parameters, which should have a structure suitable for passing to <span>`cqueues.dns.config.new` </span>.
 
@@ -1169,11 +1169,11 @@ Return the string “dns resolver pool” if $obj$ is a resolver pool object, or
 
 Behaves similar to <span>`resolver:new` </span>. Returns a new resolver pool object.
 
-#### <span>`resolvers.stub{ \ldots }` </span>
+#### <span>`resolvers.stub{ … }` </span>
 
 Returns a stub resolver pool, with each resolver optionally initialized to the defined config parameters, which should have a structure suitable for passing to <span>`cqueues.dns.config.new` </span>.
 
-#### <span>`resolvers.root{ \ldots }` </span>
+#### <span>`resolvers.root{ … }` </span>
 
 Returns a recursive resolver pool, with each resolver optionally initialized to the defined config parameters, which should have a structure suitable for passing to <span>`cqueues.dns.config.new` </span>.
 
@@ -1209,7 +1209,7 @@ Returns a new condition variable object. If ‘lifo’ is `true`, waiting thread
 
 Note that the <span>`cqueues` </span>scheduler might schedule execution of multiple woken threads in a different order. The LIFO/FIFO behavior is most useful when implementing a mutex and for whatever reason you wish to select the thread which has waited either the longest or shortest amount of time.
 
-#### <span>`condition:wait([\ldots])` </span>
+#### <span>`condition:wait([…])` </span>
 
 Wait on the condition variable. Additional arguments are yielded to the <span>`cqueues` </span>controller for polling. Passing an integer, for example, allows you to effect a timeout. Passing a socket allows you to wait on both the condition variable and the socket.
 
@@ -1231,7 +1231,7 @@ The promise object uses a condition variable to wakeup any coroutines waiting in
 
 Returns the string “promise” if $obj$ is a promise, or $nil$ otherwise.
 
-#### <span>`promise.new([f[, \ldots]])` </span>
+#### <span>`promise.new([f[, …]])` </span>
 
 Returns a new promise object. $f$ is an optional function to run asynchronously, to which any subsequent arguments are passed. $f$ is called using <span>`pcall` </span>, and the return values of <span>`pcall` </span> are passed directly to <span>`promise:set` </span>.
 
@@ -1239,7 +1239,7 @@ Returns a new promise object. $f$ is an optional function to run asynchronously,
 
 Returns “pending” if the promise is yet unresolved, “fulfilled” if the promise has been resolved (<span>`promise:get` </span> will return the values), or “rejected” if the promise failed (<span>`promise:get` </span> will throw an error).
 
-#### <span>`promise:set(ok[, \ldots])` </span>
+#### <span>`promise:set(ok[, …])` </span>
 
 Resolves the state of the promise object. If $ok$ is <span>`true` </span>then any subsequent arguments will be returned to <span>`promise:get` </span> callers. If $ok$ is <span>`false` </span>then an error will be thrown to <span>`promise:get` </span> callers, with the error value taken from the first subsequent argument, if any.
 
@@ -1261,7 +1261,7 @@ Returns a condition variable suitable for polling which is used to signal resolu
 
 The auxiliary module exposes some convenience interfaces, including some interfaces to help with application integration or for dealing with quirky behavior that hasn’t yet been changed because of API stability concerns.
 
-#### <span>`auxlib.assert(v [\ldots])` </span>
+#### <span>`auxlib.assert(v […])` </span>
 
 Similar to Lua’s built-in <span>`assert` </span>, except that when $v$ is false searches the argument list for the first non-nil, non-false value to use as the message. If the message is an integer, applies <span>`errno.strerror` </span> to derive a human readable string.
 
@@ -1269,7 +1269,7 @@ This routine can be explicitly monkey patched to be the global <span>`assert` </
 
 Most <span>`cqueues` </span>interfaces return a single integer error rather than the Lua-idiomatic string followed by an integer error. The original concern was that most “errors” would be EAGAIN, ETIMEDOUT, or EPIPE, which occur very often and would be costly to continually copy onto the stack as strings, especially given that they’d normally be discarded. In the future the plan is to revert to the idiomatic return protocol used by Lua’s <span>`file` </span> API, but memoize the more common errno string representations using upvalues so they can be efficiently returned.
 
-#### <span>`auxlib.fileresult(v [\ldots])` </span>
+#### <span>`auxlib.fileresult(v […])` </span>
 
 Serves a similar purpose as <span>`auxlib.assert` </span>, except on error returns $v$ (<span>`nil` </span>or <span>`false` </span>) followed by the string message and any integer error. For example, in
 
@@ -1285,7 +1285,7 @@ $v$ is <span>`false` </span>, $why$ is “Operation not permitted”, and $syser
 
 $v$ is <span>`nil` </span>, $why$ is “No such file or directory”, and $syserr$ is <span>`nil` </span>.
 
-#### <span>`auxlib.resume(co [\ldots])` </span>
+#### <span>`auxlib.resume(co […])` </span>
 
 Similar to Lua’s built-in <span>`coroutine.resume` </span>, except that when coroutines yield using <span>`cqueues.poll` </span> recursively yields up the stack until the controller is reached, and then silently restart the coroutine when the poll operation completes. This permits creating iterators which can transparently yield. The application must be careful to ensure that this wrapper is used at every point in a yield/resume chain to get the automatic behavior.
 
