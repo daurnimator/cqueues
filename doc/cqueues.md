@@ -186,13 +186,13 @@ The <span>`:events` </span> method should return a string or nil. <span>`cqueues
 The <span>`:timeout` </span> should return a number or nil. This schedules an independent timeout event. To effect a simple one second timeout, you can do
 
 ``` {language="lua"}
-        cqueues.poll({ timeout = function() return 1.0 end })
+cqueues.poll({ timeout = function() return 1.0 end })
 ```
 
 which is equivalent to the shortcut
 
 ``` {language="lua"}
-    cqueues.poll(1.0)
+cqueues.poll(1.0)
 ```
 
 Instantiated <span>`cqueues` </span>objects implement all three methods.[^4] In particular, this means that you can stack <span>`cqueues` </span>, or poll on a <span>`cqueues` </span>object using some other event loop library. Each <span>`cqueues` </span>object is entirely self-contained, without any global state.

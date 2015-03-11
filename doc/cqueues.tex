@@ -248,13 +248,13 @@ be a condition variable instead of a function. This permits user code to create 
 \subsubsection[\method{object:timeout}]{\method{:timeout()}} The \method{:timeout} should return a number or nil. This schedules an independent timeout event. To effect a simple one second timeout, you can do
 
 \begin{lstlisting}[language=lua]
-        cqueues.poll({ timeout = function() return 1.0 end })
+cqueues.poll({ timeout = function() return 1.0 end })
 \end{lstlisting}
 
 which is equivalent to the shortcut
 
 \begin{lstlisting}[language=lua]
-	cqueues.poll(1.0)
+cqueues.poll(1.0)
 \end{lstlisting}
 
 Instantiated \cqueues objects implement all three methods.\footnote{\method{:pollfd} returns the internal \syscall{kqueue}, \syscall{epoll}, or Ports descriptor; \method{:events} returns ``r''; and \method{:timeout} returns the time to the next internal timeout event.} In particular, this means that you can stack \cqueues, or poll on a \cqueues object using some other event loop library. Each \cqueues object is entirely self-contained, without any global state.
