@@ -4,19 +4,6 @@ author:
 title: ' The <span>`cqueues` </span>User Guide '
 ...
 
-for composing\
-
-Socket, Signal, Thread, & File Change Messaging\
-
-on\
-
-Linux, OS X, Solaris,\
-FreeBSD, NetBSD, & OpenBSD
-
-with\
-
-<span>![image](art/lua.pdf)</span>
-
 Dependencies
 ============
 
