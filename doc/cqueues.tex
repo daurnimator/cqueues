@@ -379,7 +379,7 @@ Return a new socket immediately ready for reading or writing. DNS lookup and TCP
 \subsubsection[\fn{socket.connect}]{\fn{socket.connect\{ … \}}}
 Like \fn{socket.connect} with list arguments, but takes a table of named arguments:
 
-\begin{ctabular}{r | c | p{4.5in}}
+\begin{tabular}{r | c | p{4.5in}}
 field & type:default & description\\\hline
 .host & string:nil & IP address or host domain name \\
 
@@ -422,7 +422,7 @@ field & type:default & description\\\hline
           & string:nil & send specified string as TLS SNI host name \\
 
 .time & boolean:true & track elapsed time for statistics \\
-\end{ctabular}
+\end{tabular}
 
 \subsubsection[\fn{socket.listen}]{\fn{socket.listen(host, port)}}
 	Return a new socket immediately ready for accepting connections.
@@ -488,14 +488,14 @@ Sets the the input and output buffering and translation modes. Either mode can b
 
 A mode is specified as a string containing one or more of the following flags
 
-\begin{ctabular}{c | p{6in}}
+\begin{tabular}{c | p{6in}}
 flag & description \\\hline
 t & text mode; input or output undergoes LF/CRLF translation \\
 b & binary mode; no LF/CRLF translation \\
 n & no output buffering \\
 l & line buffered output \\
 f & fully buffered output \\
-\end{ctabular}
+\end{tabular}
 
 Returns the previous input and output modes as fixed-sized strings. At present the first character is one of ``t'' or ``b'', and the second character one of ``n'', ``l'', ``f'', or ``-'' (for in the input mode).
 
@@ -992,7 +992,7 @@ Add or interpose a config class method. Returns the previous method, if any.
 
 Returns a new config object, optionally initialized according to the specified table values.
 
-\begin{ctabular}{ c | c | p{5in} }
+\begin{tabular}{ c | c | p{5in} }
 field & type & description\\\hline
 .nameserver & table & list of IP address strings to use for stub resolvers\\
 .search & table & list of domain suffixes to append to query names\\
@@ -1007,7 +1007,7 @@ field & type & description\\\hline
 ..smart & boolean & for NS, MX, SRV and similar record queries, resolve the A record if not included as glue in the initial answer\\
 ..tcp & number & see TCP\_ENABLE, TCP\_ONLY, TCP\_DISABLE in \fn{config[]}\\
 .interface & string & IP address to bind to when querying (e.g. [192.168.1.1]:1234)
-\end{ctabular}
+\end{tabular}
 \subsubsection[\fn{config.stub}]{\fn{config.stub\{ … \}}}
 
 Returns a config object initialized for a stub resolver by loading the relevant system files; e.g. /etc/resolv.conf and /etc/nsswitch.conf. Takes optional initialization values like \fn{config.new}.
@@ -1154,7 +1154,7 @@ Process a previously submitted query. Returns a \module{dns.packet} object on su
 
 Returns a table of statistics for the resolver instance.
 
-\begin{ctabular}{ c | p{5in}}
+\begin{tabular}{ c | p{5in}}
 field & description\\\hline
 .queries & number of queries submitted \\
 .udp.sent.count & number of UDP packets sent \\
@@ -1166,7 +1166,7 @@ field & description\\\hline
 .tcp.rcvd.count & number of TCP packets received \\
 .tcp.rcvd.bytes & number of TCP bytes received \\
 
-\end{ctabular}
+\end{tabular}
 \subsubsection[\fn{resolver:close}]{\fn{resolver:close()}}
 
 Explicitly destroy the resolver object, immediately closing all internal descriptors. This routine ensures all descriptors are properly cancelled.

@@ -467,12 +467,13 @@ Sets the the input and output buffering and translation modes. Either mode can b
 
 A mode is specified as a string containing one or more of the following flags
 
-<span>c | p<span>6in</span></span> flag & description\
-t & text mode; input or output undergoes LF/CRLF translation\
-b & binary mode; no LF/CRLF translation\
-n & no output buffering\
-l & line buffered output\
-f & fully buffered output\
+   flag  description
+  ------ ----------------------------------------------------------
+    t    text mode; input or output undergoes LF/CRLF translation
+    b    binary mode; no LF/CRLF translation
+    n    no output buffering
+    l    line buffered output
+    f    fully buffered output
 
 Returns the previous input and output modes as fixed-sized strings. At present the first character is one of “t” or “b”, and the second character one of “n”, “l”, “f”, or “-” (for in the input mode).
 
@@ -974,20 +975,21 @@ Add or interpose a config class method. Returns the previous method, if any.
 
 Returns a new config object, optionally initialized according to the specified table values.
 
-<span> c | c | p<span>5in</span> </span> field & type & description\
-.nameserver & table & list of IP address strings to use for stub resolvers\
-.search & table & list of domain suffixes to append to query names\
-.lookup & table & order of lookup methods—“file” and “bind”\
-.options & table & canonical location for .edns0, .ndots, .timeout, .attempts, .rotate, .recurse, .smart, and .tcp options\
-..edns0 & boolean & enable EDNS0 support\
-..ndots & number & if query name has fewer labels than this, reverse suffix search order\
-..timeout & number & timeout between query retries\
-..attempts & number & maximum number of attempts per nameserver\
-..rotate & boolean & randomize nameserver selection\
-..recurse & boolean & query recursively instead of as a simple stub resolver\
-..smart & boolean & for NS, MX, SRV and similar record queries, resolve the A record if not included as glue in the initial answer\
-..tcp & number & see TCP\_ENABLE, TCP\_ONLY, TCP\_DISABLE in <span>`config[]` </span>\
-.interface & string & IP address to bind to when querying (e.g. [192.168.1.1]:1234)
+      field       type    description
+  ------------- --------- ----------------------------------------------------------------------------------------------------------------
+   .nameserver    table   list of IP address strings to use for stub resolvers
+     .search      table   list of domain suffixes to append to query names
+     .lookup      table   order of lookup methods—“file” and “bind”
+    .options      table   canonical location for .edns0, .ndots, .timeout, .attempts, .rotate, .recurse, .smart, and .tcp options
+     ..edns0     boolean  enable EDNS0 support
+     ..ndots     number   if query name has fewer labels than this, reverse suffix search order
+    ..timeout    number   timeout between query retries
+   ..attempts    number   maximum number of attempts per nameserver
+    ..rotate     boolean  randomize nameserver selection
+    ..recurse    boolean  query recursively instead of as a simple stub resolver
+     ..smart     boolean  for NS, MX, SRV and similar record queries, resolve the A record if not included as glue in the initial answer
+      ..tcp      number   see TCP\_ENABLE, TCP\_ONLY, TCP\_DISABLE in <span>`config[]` </span>
+   .interface    string   IP address to bind to when querying (e.g. [192.168.1.1]:1234)
 
 #### <span>`config.stub{ … }` </span>
 
@@ -1129,16 +1131,17 @@ Process a previously submitted query. Returns a <span>`dns.packet` </span> objec
 
 Returns a table of statistics for the resolver instance.
 
-<span> c | p<span>5in</span></span> field & description\
-.queries & number of queries submitted\
-.udp.sent.count & number of UDP packets sent\
-.udp.sent.bytes & number of UDP bytes sent\
-.udp.rcvd.count & number of UDP packets received\
-.udp.rcvd.bytes & number of UDP bytes received\
-.tcp.sent.count & number of TCP packets sent\
-.tcp.sent.bytes & number of TCP bytes sent\
-.tcp.rcvd.count & number of TCP packets received\
-.tcp.rcvd.bytes & number of TCP bytes received\
+        field       description
+  ----------------- --------------------------------
+      .queries      number of queries submitted
+   .udp.sent.count  number of UDP packets sent
+   .udp.sent.bytes  number of UDP bytes sent
+   .udp.rcvd.count  number of UDP packets received
+   .udp.rcvd.bytes  number of UDP bytes received
+   .tcp.sent.count  number of TCP packets sent
+   .tcp.sent.bytes  number of TCP bytes sent
+   .tcp.rcvd.count  number of TCP packets received
+   .tcp.rcvd.bytes  number of TCP bytes received
 
 #### <span>`resolver:close()` </span>
 
