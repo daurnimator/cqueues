@@ -351,45 +351,28 @@ Return a new socket immediately ready for reading or writing. DNS lookup and TCP
 
 Like <span>`socket.connect` </span> with list arguments, but takes a table of named arguments:
 
-<span>r | c | p<span>4.5in</span></span> field & type:default & description\
-.host & string:nil & IP address or host domain name\
-
-.port & string:nil & host port\
-
-.path & string:nil & UNIX domain socket path\
-
-.family & number & protocol family—AF\_INET (default), AF\_INET6, AF\_UNIX (default if .path specified)\
-
-.type & number & protocol type—SOCK\_STREAM (default) or SOCK\_DGRAM\
-
-.mode & string:nil & fchmod or chmod socket after creating UNIX domain socket\
-
-.mask & string:nil & set and restore umask when binding UNIX domain sockets\
-
-.unlink & boolean:false & unlink socket path before binding\
-
-.reuseaddr & boolean:true & SO\_REUSEADDR socket option\
-
-.reuseport & boolean:false & SO\_REUSEPORT socket option\
-
-.nodelay & boolean:false & TCP\_NODELAY IP option\
-
-.nopush & boolean:false & TCP\_NOPUSH, TCP\_CORK, or equivalent IP option\
-
-.v6only & boolean:nil & enables or disables IPV6\_V6ONLY IPv6 option, otherwise the system default is left as-is\
-
-.nonblock & boolean:true & O\_NONBLOCK descriptor flag\
-
-.cloexec & boolean:true & O\_CLOEXEC descriptor flag\
-
-.nosigpipe & boolean:true & O\_NOSIGPIPE, SO\_NOSIGPIPE, MSG\_NOSIGNAL, or equivalent descriptor flag\
-
-.verify & boolean:false & require SSL certificate verification\
-
-.sendname & boolean:true & send connect host as TLS SNI host name\
-& string:nil & send specified string as TLS SNI host name\
-
-.time & boolean:true & track elapsed time for statistics\
+         field  type:default   description
+  ------------ --------------- ------------------------------------------------------------------------------------------
+         .host   string:nil    IP address or host domain name
+         .port   string:nil    host port
+         .path   string:nil    UNIX domain socket path
+       .family     number      protocol family—AF\_INET (default), AF\_INET6, AF\_UNIX (default if .path specified)
+         .type     number      protocol type—SOCK\_STREAM (default) or SOCK\_DGRAM
+         .mode   string:nil    fchmod or chmod socket after creating UNIX domain socket
+         .mask   string:nil    set and restore umask when binding UNIX domain sockets
+       .unlink  boolean:false  unlink socket path before binding
+    .reuseaddr  boolean:true   SO\_REUSEADDR socket option
+    .reuseport  boolean:false  SO\_REUSEPORT socket option
+      .nodelay  boolean:false  TCP\_NODELAY IP option
+       .nopush  boolean:false  TCP\_NOPUSH, TCP\_CORK, or equivalent IP option
+       .v6only   boolean:nil   enables or disables IPV6\_V6ONLY IPv6 option, otherwise the system default is left as-is
+     .nonblock  boolean:true   O\_NONBLOCK descriptor flag
+      .cloexec  boolean:true   O\_CLOEXEC descriptor flag
+    .nosigpipe  boolean:true   O\_NOSIGPIPE, SO\_NOSIGPIPE, MSG\_NOSIGNAL, or equivalent descriptor flag
+       .verify  boolean:false  require SSL certificate verification
+     .sendname  boolean:true   send connect host as TLS SNI host name
+                 string:nil    send specified string as TLS SNI host name
+         .time  boolean:true   track elapsed time for statistics
 
 #### <span>`socket.listen(host, port)` </span>
 
