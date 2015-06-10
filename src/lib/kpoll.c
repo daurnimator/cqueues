@@ -31,7 +31,7 @@
 
 #include <errno.h>	/* errno */
 
-#include <poll.h>	/* POLLIN POLLOUT */
+#include <poll.h>	/* POLLIN POLLOUT POLLPRI */
 
 #include <unistd.h>	/* [FEATURES] read(2) write(2) */
 
@@ -138,7 +138,17 @@ static inline short event_pending(const event_t *event) {
 #elif HAVE_PORTS
 	return event->portev_events;
 #else
-	return (event->filter == EVFILT_READ)? POLLIN : (event->filter == EVFILT_WRITE)? POLLOUT : 0;
+	if (event->filter == EVFILT_READ) {
+		if (event->flags & EV_OOBAND) {
+			return POLLPRI;
+		} else {
+			return POLLIN;
+		}
+	} else if(event->filter == EVFILT_WRITE) {
+		return POLLOUT;
+	} else {
+		return 0;
+	}
 #endif
 } /* event_pending() */
 
@@ -216,22 +226,22 @@ static int kpoll_ctl(struct kpoll *kp, struct kpollfd *fd, short events) {
 #else
 	struct kevent event;
 
-	if (events & POLLIN) {
-		if (!(fd->events & POLLIN)) {
-			EV_SETx(&event, fd->fd, EVFILT_READ, EV_ADD, 0, 0, fd);
+	if (events & (POLLIN|POLLPRI)) {
+		if (!(fd->events & (POLLIN|POLLPRI))) {
+			EV_SETx(&event, fd->fd, EVFILT_READ, EV_ADD, events&POLLPRI?EV_OOBAND:0, 0, fd);
 
 			if (0 != kevent(kp->fd, &event, 1, NULL, 0, &(struct timespec){ 0, 0 }))
 				goto error;
 
-			fd->events |= POLLIN;
+			fd->events |= POLLIN|POLLPRI;
 		}
-	} else if (fd->events & POLLIN) {
+	} else if (fd->events & (POLLIN|POLLPRI)) {
 		EV_SETx(&event, fd->fd, EVFILT_READ, EV_DELETE, 0, 0, NULL);
 
 		if (0 != kevent(kp->fd, &event, 1, NULL, 0, &(struct timespec){ 0, 0 }))
 			goto error;
 
-		fd->events &= ~POLLIN;
+		fd->events &= ~(POLLIN|POLLPRI);
 	}
 
 	if (events & POLLOUT) {

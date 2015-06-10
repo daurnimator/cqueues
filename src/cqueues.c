@@ -39,7 +39,7 @@
 #include <sys/select.h>	/* pselect(3) */
 #include <unistd.h>	/* close(2) */
 #include <fcntl.h>	/* F_SETFD FD_CLOEXEC fcntl(2) */
-#include <poll.h>	/* POLLIN POLLOUT */
+#include <poll.h>	/* POLLIN POLLOUT POLLPRI */
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -506,7 +506,17 @@ static inline short kpoll_pending(const kpoll_event_t *event) {
 #elif HAVE_PORTS
 	return event->portev_events;
 #else
-	return (event->filter == EVFILT_READ)? POLLIN : (event->filter == EVFILT_WRITE)? POLLOUT : 0;
+	if (event->filter == EVFILT_READ) {
+		if (event->flags & EV_OOBAND) {
+			return POLLPRI;
+		} else {
+			return POLLIN;
+		}
+	} else if(event->filter == EVFILT_WRITE) {
+		return POLLOUT;
+	} else {
+		return 0;
+	}
 #endif
 } /* kpoll_pending() */
 
@@ -563,22 +573,22 @@ static int kpoll_ctl(struct kpoll *kp, int fd, short *state, short events, void 
 	if (*state == events)
 		return 0;
 
-	if (events & POLLIN) {
-		if (!(*state & POLLIN)) {
-			KP_SET(&event, fd, EVFILT_READ, EV_ADD, 0, 0, udata);
+	if (events & (POLLIN|POLLPRI)) {
+		if (!(*state & (POLLIN|POLLPRI))) {
+			KP_SET(&event, fd, EVFILT_READ, EV_ADD, events&POLLPRI?EV_OOBAND:0, 0, udata);
 
 			if (0 != kevent(kp->fd, &event, 1, NULL, 0, &(struct timespec){ 0, 0 }))
 				return errno;
 
-			*state |= POLLIN;
+			*state |= POLLIN|POLLPRI;
 		}
-	} else if (*state & POLLIN) {
+	} else if (*state & (POLLIN|POLLPRI)) {
 		KP_SET(&event, fd, EVFILT_READ, EV_DELETE, 0, 0, NULL);
 
 		if (0 != kevent(kp->fd, &event, 1, NULL, 0, &(struct timespec){ 0, 0 }))
 			return errno;
 
-		*state &= ~POLLIN;
+		*state &= ~(POLLIN|POLLPRI);
 	}
 
 	if (events & POLLOUT) {
@@ -1626,7 +1636,7 @@ static cqs_status_t object_getinfo(lua_State *L, struct cqueue *Q, struct callin
 			goto oops;
 
 		if (lua_isnumber(L, -1)) {
-			event->events = (POLLIN|POLLOUT) & lua_tointeger(L, -1);
+			event->events = (POLLIN|POLLOUT|POLLPRI) & lua_tointeger(L, -1);
 		} else {
 			const char *mode = luaL_optstring(L, -1, "");
 
@@ -1637,6 +1647,8 @@ static cqs_status_t object_getinfo(lua_State *L, struct cqueue *Q, struct callin
 					event->events |= POLLIN;
 				else if (*mode == 'w')
 					event->events |= POLLOUT;
+				else if (*mode == 'p')
+					event->events |= POLLPRI;
 				mode++;
 			}
 		}
@@ -2181,7 +2193,7 @@ static cqs_error_t cqueue_cancelfd(struct cqueue *Q, int fd) {
 	if (!(fileno = fileno_find(Q, fd)))
 		return 0;
 
-	fileno_signal(Q, fileno, POLLIN|POLLOUT);
+	fileno_signal(Q, fileno, POLLIN|POLLOUT|POLLPRI);
 
 	return fileno_ctl(Q, fileno, 0);
 } /* cqueue_cancelfd() */
