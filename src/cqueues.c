@@ -2099,29 +2099,11 @@ static cqs_status_t cqueue_process_threads(lua_State *L, struct cqueue *Q, struc
 
 
 static cqs_status_t cqueue_process(lua_State *L, struct cqueue *Q, struct callinfo *I) {
-	int onalert = 0;
-	kpoll_event_t *ke;
-	struct fileno *fileno;
 	struct event *event;
 	struct thread *T;
 	struct timer *timer;
 	double curtime;
-	short events;
 	int status;
-
-	KPOLL_FOREACH(ke, &Q->kp) {
-		if (kpoll_isalert(&Q->kp, ke)) {
-			onalert = 1;
-
-			continue;
-		}
-
-		fileno = kpoll_udata(ke);
-		events = kpoll_pending(ke);
-
-		fileno_signal(Q, fileno, events);
-		fileno->state = kpoll_diff(ke, fileno->state);
-	}
 
 	curtime = monotime();
 
@@ -2145,12 +2127,40 @@ static cqs_status_t cqueue_process(lua_State *L, struct cqueue *Q, struct callin
 		return status;
 	}
 
+	return LUA_OK;
+} /* cqueue_process() */
+
+
+static cqs_status_t cqueue_kpoll_result(lua_State *L, struct cqueue *Q, struct callinfo *I) {
+	struct fileno *fileno;
+	int onalert = 0;
+	kpoll_event_t *ke;
+	short events;
+	cqs_status_t status;
+
+	KPOLL_FOREACH(ke, &Q->kp) {
+		if (kpoll_isalert(&Q->kp, ke)) {
+			onalert = 1;
+
+			continue;
+		}
+
+		fileno = kpoll_udata(ke);
+		events = kpoll_pending(ke);
+
+		fileno_signal(Q, fileno, events);
+		fileno->state = kpoll_diff(ke, fileno->state);
+	}
+
+	if (LUA_OK != (status = cqueue_process(L, Q, I)))
+		return status;
+
 	if (onalert) {
 		kpoll_calm(&Q->kp);
 	}
 
 	return LUA_OK;
-} /* cqueue_process() */
+} /* cqueues_kpoll_result */
 
 
 static double cqueue_timeout_(struct cqueue *Q) {
@@ -2247,7 +2257,7 @@ static int cqueue_step(lua_State *L) {
 			goto oops;
 		}
 
-		switch(cqueue_process(L, Q, &I)) {
+		switch(cqueue_kpoll_result(L, Q, &I)) {
 		case LUA_OK:
 			break;
 		case LUA_YIELD:
