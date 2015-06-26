@@ -2434,6 +2434,15 @@ static int cqueue_pollset(lua_State *L) {
 	lua_newtable(L); /* POLLIN */
 	lua_newtable(L); /* POLLOUT */
 	lua_newtable(L); /* POLLPRI */
+
+	/* internal fd where alerts are signalled */
+#if HAVE_PORTS
+	lua_pushinteger(L, kp->fd);
+#else
+	lua_pushinteger(L, kp->alert.fd[0]);
+#endif
+	lua_rawseti(L, -4, ++r);
+
 	LIST_FOREACH(fileno, &Q->fileno.polling, le) {
 		if (fileno->state & POLLIN) {
 			lua_pushinteger(L, fileno->fd);
@@ -2448,8 +2457,71 @@ static int cqueue_pollset(lua_State *L) {
 			lua_rawseti(L, -2, ++p);
 		}
 	}
+
 	return 3;
 } /* cqueue_pollset() */
+
+
+static int cqueue_pollresult(lua_State *L) {
+	struct callinfo I;
+	struct cqueue *Q = cqueue_checkself(L, 1);
+	struct fileno *fileno;
+	int fd;
+	lua_Integer i;
+	if (!lua_isnoneornil(L, 2)) {
+		luaL_checktype(L, 2, LUA_TTABLE);
+		for (i = 1; LUA_TNIL != lua_rawgeti(L, 2, i); lua_pop(L, 1), i++) {
+			fd = luaL_checkinteger(L, -1);
+			if (-1 == fd) {
+				return luaL_error(L, "bad fd in readable set at index %d", i);
+			}
+			fileno = fileno_find(Q, fd);
+			if (NULL == fileno) {
+				return luaL_error(L, "untracked fd %d in readable set at index %d", fd, i);
+			}
+			fileno_signal(Q, fileno, POLLIN);
+		}
+	}
+	if (!lua_isnoneornil(L, 3)) {
+		luaL_checktype(L, 3, LUA_TTABLE);
+		for (i = 1; LUA_TNIL != lua_rawgeti(L, 3, i); lua_pop(L, 1), i++) {
+			fd = luaL_checkinteger(L, -1);
+			if (-1 == fd) {
+				return luaL_error(L, "bad fd in writable set at index %d", i);
+			}
+			fileno = fileno_find(Q, fd);
+			if (NULL == fileno) {
+				return luaL_error(L, "untracked fd %d in writable set at index %d", fd, i);
+			}
+			fileno_signal(Q, fileno, POLLOUT);
+		}
+	}
+	if (!lua_isnoneornil(L, 4)) {
+		luaL_checktype(L, 4, LUA_TTABLE);
+		for (i = 1; LUA_TNIL != lua_rawgeti(L, 4, i); lua_pop(L, 1), i++) {
+			fd = luaL_checkinteger(L, -1);
+			if (-1 == fd) {
+				return luaL_error(L, "bad fd in priority set at index %d", i);
+			}
+			fileno = fileno_find(Q, fd);
+			if (NULL == fileno) {
+				return luaL_error(L, "untracked fd %d in priority set at index %d", fd, i);
+			}
+			fileno_signal(Q, fileno, POLLPRI);
+		}
+	}
+
+	Q = cqueue_enter(L, &I, 1);
+	if (LUA_OK != cqueue_process(L, Q, &I))
+		goto oops;
+
+	lua_pushboolean(L, 1);
+
+	return 1;
+oops:
+	lua_pushboolean(L, 0);
+	return 1 + err_pushinfo(L, &I);
+} /* cqueue_pollresult() */
 
 
 cqs_error_t cqs_sigmask(int how, const sigset_t *set, sigset_t *oset) {
@@ -2846,6 +2918,7 @@ static const luaL_Reg cqueue_methods[] = {
 	{ "events",  &cqueue_events },
 	{ "timeout", &cqueue_timeout },
 	{ "pollset", &cqueue_pollset },
+	{ "pollresult", &cqueue_pollresult },
 	{ NULL,      NULL }
 }; /* cqueue_methods[] */
 
