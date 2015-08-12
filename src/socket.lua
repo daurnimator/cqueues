@@ -382,40 +382,41 @@ end)
 --
 -- Yielding socket:read
 --
-local function read(self, func, what, ...)
-	if not what then
-		return
-	end
+local unpack = assert(table.unpack or unpack)
+local pack = table.pack or function(...) return { n = select("#", ...); ... } end
 
-	local data, why = self:recv(what)
-
-	if not data then
-		local timeout = self:timeout()
-		local deadline = timeout and (monotime() + timeout)
-
-		repeat
-			if why == EAGAIN then
+local function read(self, func, read_formats)
+	local timeout = self:timeout()
+	local deadline = timeout and (monotime() + timeout)
+	local results = {}
+	for i=1, read_formats.n do
+		local what = read_formats[i]
+		local data
+		while true do
+			local why
+			data, why = self:recv(what)
+			if not why then
+				break
+			elseif why == EAGAIN then
 				if not timed_poll(self, deadline) then
 					return nil, oops(self, func, ETIMEDOUT, 2)
 				end
 			elseif why then
 				return nil, oops(self, func, why, 2)
-			else
-				return -- EOF or end-of-headers
 			end
-
-			data, why = self:recv(what)
-		until data
+		end
+		results[i] = data
 	end
-
-	return data, read(self, func, ...)
+	return unpack(results, 1, read_formats.n)
 end
+
+local read_line_format = {n=1, "*l"}
 
 socket.interpose("read", function(self, what, ...)
 	if what then
-		return read(self, "read", what, ...)
+		return read(self, "read", pack(what, ...))
 	else
-		return read(self, "read", "*l")
+		return read(self, "read", read_line_format)
 	end
 end)
 
@@ -486,27 +487,16 @@ end)
 --
 -- Add socket:lines
 --
--- We optimize single-mode case so we're not unpacking tables all the time.
---
-local unpack = assert(table.unpack or unpack)
-
-socket.interpose("lines", function (self, mode, ...)
-	local args = select("#", ...) > 0 and { ... }
-
-	if mode then
-		if select("#", ...) > 0 then
-			local args = { ... }
-
-			return function ()
-				return read(self, "lines", mode, unpack(args))
-			end
-		end
+socket.interpose("lines", function (self, what, ...)
+	local formats
+	if what then
+		formats = pack(what, ...)
 	else
-		mode = "*l"
+		formats = read_line_format
 	end
 
 	return function ()
-		return read(self, "lines", mode)
+		return read(self, "lines", formats)
 	end
 end)
 
