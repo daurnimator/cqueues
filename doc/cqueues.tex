@@ -463,6 +463,8 @@ field & type:default & description\\\hline
 
 .type & number & protocol type---SOCK\_STREAM (default) or SOCK\_DGRAM\\
 
+.protocol & number & protocol---0 (default)
+
 .mode & string:nil & fchmod or chmod socket after creating UNIX domain socket
 %NOTE: There's a race between bind and the following chmod. fchmod is attempted before the bind, however it fails on BSD derivatives. Not all platforms obey UNIX domain socket permissions (e.g. Solaris). Check peer credentials, instead, to be portable.
 \\
