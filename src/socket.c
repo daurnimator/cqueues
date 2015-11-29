@@ -869,7 +869,7 @@ static lso_nargs_t lso_connect2(lua_State *L) {
 	struct so_options opts;
 	struct luasocket *S;
 	size_t plen;
-	int family, type, error;
+	int family, type, protocol, error;
 
 	if (lua_istable(L, 1)) {
 		opts = lso_checkopts(L, 1);
@@ -880,6 +880,10 @@ static lso_nargs_t lso_connect2(lua_State *L) {
 
 		lua_getfield(L, 1, "type");
 		type = luaL_optinteger(L, -1, SOCK_STREAM);
+		lua_pop(L, 1);
+
+		lua_getfield(L, 1, "protocol");
+		protocol = luaL_optinteger(L, -1, 0);
 		lua_pop(L, 1);
 
 		if (lso_getfield(L, 1, "path")) {
@@ -897,6 +901,7 @@ static lso_nargs_t lso_connect2(lua_State *L) {
 		port = luaL_checkstring(L, 2);
 		family = luaL_optinteger(L, 3, AF_INET);
 		type = luaL_optinteger(L, 4, SOCK_STREAM);
+		protocol = luaL_optinteger(L, 5, 0);
 	}
 
 	S = lso_newsocket(L, type);
@@ -911,10 +916,10 @@ static lso_nargs_t lso_connect2(lua_State *L) {
 		sun.sun_family = AF_UNIX;
 		memcpy(sun.sun_path, path, MIN(plen, sizeof sun.sun_path));
 
-		if (!(S->socket = so_dial((struct sockaddr *)&sun, type, &opts, &error)))
+		if (!(S->socket = so_dial((struct sockaddr *)&sun, type, protocol, &opts, &error)))
 			goto error;
 	} else {
-		if (!(S->socket = so_open(host, port, DNS_T_A, family, type, &opts, &error)))
+		if (!(S->socket = so_open(host, port, DNS_T_A, family, type, protocol, &opts, &error)))
 			goto error;
 	}
 
@@ -957,7 +962,7 @@ static lso_nargs_t lso_listen2(lua_State *L) {
 	struct so_options opts;
 	struct luasocket *S;
 	size_t plen;
-	int family, type, error;
+	int family, type, protocol, error;
 
 	if (lua_istable(L, 1)) {
 		opts = lso_checkopts(L, 1);
@@ -968,6 +973,10 @@ static lso_nargs_t lso_listen2(lua_State *L) {
 
 		lua_getfield(L, 1, "type");
 		type = luaL_optinteger(L, -1, SOCK_STREAM);
+		lua_pop(L, 1);
+
+		lua_getfield(L, 1, "protocol");
+		protocol = luaL_optinteger(L, -1, 0);
 		lua_pop(L, 1);
 
 		if (lso_getfield(L, 1, "path")) {
@@ -985,6 +994,7 @@ static lso_nargs_t lso_listen2(lua_State *L) {
 		port = luaL_checkstring(L, 2);
 		family = luaL_optinteger(L, 3, AF_INET);
 		type = luaL_optinteger(L, 4, SOCK_STREAM);
+		protocol = luaL_optinteger(L, 5, 0);
 	}
 
 	S = lso_newsocket(L, type);
@@ -999,10 +1009,10 @@ static lso_nargs_t lso_listen2(lua_State *L) {
 		sun.sun_family = AF_UNIX;
 		memcpy(sun.sun_path, path, MIN(plen, sizeof sun.sun_path));
 
-		if (!(S->socket = so_dial((struct sockaddr *)&sun, type, &opts, &error)))
+		if (!(S->socket = so_dial((struct sockaddr *)&sun, type, protocol, &opts, &error)))
 			goto error;
 	} else {
-		if (!(S->socket = so_open(host, port, DNS_T_A, family, type, &opts, &error)))
+		if (!(S->socket = so_open(host, port, DNS_T_A, family, type, protocol, &opts, &error)))
 			goto error;
 	}
 
