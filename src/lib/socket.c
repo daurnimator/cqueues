@@ -671,7 +671,7 @@ static so_error_t so_ftype(int fd, mode_t *mode, int *domain, int *type, int *pr
 static int so_opts2flags(const struct so_options *, int *);
 static int so_type2mask(mode_t, int, int, int);
 
-int so_socket(int domain, int type, const struct so_options *opts, int *_error) {
+int so_socket5(int domain, int type, int protocol, const struct so_options *opts, int *_error) {
 	int error, fd, flags, mask, need;
 
 	flags = so_opts2flags(opts, &mask);
@@ -691,7 +691,7 @@ int so_socket(int domain, int type, const struct so_options *opts, int *_error) 
 	mask &= ~SO_F_CLOEXEC;
 #endif
 
-	if (-1 == (fd = socket(domain, type, 0)))
+	if (-1 == (fd = socket(domain, type, protocol)))
 		goto syerr;
 
 	/* assumes natural state of socket is all flags off */
@@ -709,7 +709,7 @@ error:
 	so_closesocket(&fd, opts);
 
 	return -1;
-} /* so_socket() */
+} /* so_socket5() */
 
 
 #define so_bind(...) SO_EXTENSION so_bind(__VA_ARGS__)
@@ -1351,13 +1351,13 @@ static int so_socket_(struct socket *so) {
 
 	so_closesocket(&so->fd, &so->opts);
 
-	if (-1 == (so->fd = so_socket(so->host->ai_family, so->host->ai_socktype, &so->opts, &error)))
+	if (-1 == (so->fd = so_socket(so->host->ai_family, so->host->ai_socktype, so->host->ai_protocol, &so->opts, &error)))
 		return error;
 
 	so->mode = S_IFSOCK;
 	so->domain = so->host->ai_family;
 	so->type = so->host->ai_socktype;
-	so->protocol = 0;
+	so->protocol = so->host->ai_protocol;
 	if ((error = so_ftype(so->fd, &so->mode, &so->domain, &so->type, &so->protocol)))
 		return error;
 
@@ -1821,7 +1821,7 @@ static _Bool sa_isnumeric(const char *host) {
 } /* sa_isnumeric() */
 
 
-struct socket *(so_open)(const char *host, const char *port, int qtype, int domain, int type, const struct so_options *opts, int *error_) {
+struct socket *(so_open8)(const char *host, const char *port, int qtype, int domain, int type, int protocol, const struct so_options *opts, int *error_) {
 	_Bool isnumeric = sa_isnumeric(host);
 	struct dns_resolver *res = NULL;
 	struct addrinfo hints;
@@ -1853,6 +1853,7 @@ struct socket *(so_open)(const char *host, const char *port, int qtype, int doma
 	hints.ai_flags    = AI_CANONNAME;
 	hints.ai_family   = domain;
 	hints.ai_socktype = type;
+	hints.ai_protocol = protocol;
 
 	if (isnumeric) {
 		hints.ai_flags |= AI_NUMERICHOST;
@@ -1887,7 +1888,7 @@ error:
 } /* so_open() */
 
 
-struct socket *so_dial(const struct sockaddr *sa, int type, const struct so_options *opts, int *error_) {
+struct socket *so_dial5(const struct sockaddr *sa, int type, int protocol, const struct so_options *opts, int *error_) {
 	struct { struct addrinfo ai; struct sockaddr_storage ss; } *host;
 	struct socket *so;
 	int error;
@@ -1904,7 +1905,7 @@ struct socket *so_dial(const struct sockaddr *sa, int type, const struct so_opti
 	so->host = &host->ai;
 	so->host->ai_family = sa->sa_family;
 	so->host->ai_socktype = type;
-	so->host->ai_protocol = 0;
+	so->host->ai_protocol = protocol;
 	so->host->ai_addrlen = af_len(sa->sa_family);
 	so->host->ai_addr = (struct sockaddr *)&host->ss;
 
@@ -1919,7 +1920,7 @@ error:
 	*error_ = error;
 
 	return 0;
-} /* so_dial() */
+} /* so_dial5() */
 
 
 struct socket *so_fdopen(int fd, const struct so_options *opts, int *error_) {
@@ -3073,7 +3074,7 @@ int httpget(const char *url) {
 
 	parseurl(url);
 
-	if (!(so = so_open(MAIN.url.host, MAIN.url.port, DNS_T_A, PF_INET, SOCK_STREAM, so_opts(), &error)))
+	if (!(so = so_open(MAIN.url.host, MAIN.url.port, DNS_T_A, PF_INET, SOCK_STREAM, 0, so_opts(), &error)))
 		errx(EXIT_FAILURE, "so_open: %s", so_strerror(error));
 
 	so_connect(so);
@@ -3169,10 +3170,10 @@ int echo(void) {
 	struct iovec iov;
 	int fd, error;
 
-	if (!(srv0 = so_open("127.0.0.1", "54321", DNS_T_A, PF_INET, SOCK_STREAM, so_opts(), &error)))
+	if (!(srv0 = so_open("127.0.0.1", "54321", DNS_T_A, PF_INET, SOCK_STREAM, 0, so_opts(), &error)))
 		panic("so_open: %s", so_strerror(error));
 
-	if (!(cli = so_open("127.0.0.1", "54321", DNS_T_A, PF_UNSPEC, SOCK_STREAM, so_opts(), &error)))
+	if (!(cli = so_open("127.0.0.1", "54321", DNS_T_A, PF_UNSPEC, SOCK_STREAM, 0, so_opts(), &error)))
 		panic("so_open: %s", so_strerror(error));
 
 	so_listen(srv0);

@@ -436,7 +436,9 @@ static inline char *so_itoa(char *dst, size_t lim, long i) {
 
 void *sa_egress(void *, size_t, sockaddr_arg_t, int *);
 
-int so_socket(int, int, const struct so_options *, int *);
+int so_socket5(int, int, int, const struct so_options *, int *);
+#define so_socket4(d, t, o, e) so_socket5((d), (t), 0, (o), (e))
+#define so_socket(...) SO_XPASTE(so_socket, SO_NARG(__VA_ARGS__))(__VA_ARGS__)
 
 int so_bind(int, sockaddr_arg_t, const struct so_options *);
 
@@ -497,15 +499,17 @@ so_error_t so_delfl(int fd, int flags, int require);
 
 struct socket;
 
-struct socket *so_open(const char *, const char *, int, int, int, const struct so_options *, int *);
+struct socket *so_open8(const char *, const char *, int, int, int, int, const struct so_options *, int *);
 
 #if __GNUC__ /* Coerce port to string if not already. */
-#define so_open(host, port, ...) so_open((host), so_ytoa((port)), __VA_ARGS__)
-#else
-#define so_open(...) so_open(__VA_ARGS__)
+#define so_open8(host, port, ...) so_open8((host), so_ytoa((port)), __VA_ARGS__)
 #endif
+#define so_open7(h, p, q, d, t, o, e) so_open8((h), (p), (q), (d), (t), 0, (o), (e))
+#define so_open(...) SO_XPASTE(so_open, SO_NARG(__VA_ARGS__))(__VA_ARGS__)
 
-struct socket *so_dial(const struct sockaddr *, int, const struct so_options *, int *);
+struct socket *so_dial5(const struct sockaddr *, int, int, const struct so_options *, int *);
+#define so_dial4(s, t, o, e) so_dial5((s), (t), 0, (o), (e))
+#define so_dial(...) SO_XPASTE(so_dial, SO_NARG(__VA_ARGS__))(__VA_ARGS__)
 
 struct socket *so_fdopen(int, const struct so_options *, int *);
 
