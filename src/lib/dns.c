@@ -7746,6 +7746,9 @@ size_t dns_ai_print(void *dst, size_t lim, struct addrinfo *ent, struct dns_addr
 		break;
 	}
 
+	cp	+= dns__printstring(dst, lim, cp, ".ai_protocol  = ");
+	cp	+= dns__print10(dst, lim, cp, ent->ai_protocol, 0);
+
 	cp	+= dns__printchar(dst, lim, cp, '\n');
 
 	cp	+= dns__printstring(dst, lim, cp, ".ai_addr      = [");
@@ -8725,7 +8728,7 @@ static int resolve_addrinfo(int argc DNS_NOTUSED, char *argv[]) {
 	struct dns_hints *(*hints)() = (recurse)? &dns_hints_root : &dns_hints_local;
 	struct dns_resolver *res = NULL;
 	struct dns_addrinfo *ai = NULL;
-	struct addrinfo ai_hints = { .ai_family = PF_UNSPEC, .ai_socktype = SOCK_STREAM, .ai_flags = AI_CANONNAME };
+	struct addrinfo ai_hints = { .ai_family = PF_UNSPEC, .ai_socktype = SOCK_STREAM, .ai_protocol = 0, .ai_flags = AI_CANONNAME };
 	struct addrinfo *ent;
 	char pretty[512];
 	int error;
