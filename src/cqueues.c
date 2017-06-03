@@ -2455,6 +2455,17 @@ static int cqueue_cancel(lua_State *L) {
 } /* cqueue_cancel() */
 
 
+static int cqueue_signal(lua_State *L) {
+	struct callinfo I;
+	struct cqueue *Q = cqueue_enter(L, &I, 1);
+	int mask = luaL_checkinteger(L, 2);
+
+	cqueue_signalfd(Q, cqueue_checkfd(L, &I, index), mask);
+
+	return 0;
+} /* cqueue_signal() */
+
+
 static int cqueue_reset(lua_State *L) {
 	struct cqueue *Q = cqueue_checkself(L, 1);
 	int error;
@@ -2802,6 +2813,18 @@ static int cstack_cancel(lua_State *L) {
 } /* cstack_cancel() */
 
 
+static int cstack_signal(lua_State *L) {
+	struct callinfo I = CALLINFO_INITIALIZER;
+	struct cstack *CS = cstack_self(L);
+
+	int fd = cqueue_checkfd(L, &I, 1);
+	int mask = luaL_checkinteger(L, 2);
+	cstack_signalfd(CS, fd, -1);
+
+	return 0;
+} /* cstack_signal() */
+
+
 void cqs_cancelfd(lua_State *L, int fd) {
 	cstack_signalfd(cstack_self(L), fd, -1);
 } /* cqs_cancelfd() */
@@ -2880,6 +2903,7 @@ static const luaL_Reg cqueue_methods[] = {
 	{ "empty",   &cqueue_empty },
 	{ "count",   &cqueue_count },
 	{ "cancel",  &cqueue_cancel },
+	{ "signal",  &cqueue_signal },
 	{ "reset",   &cqueue_reset },
 	{ "pause",   &cqueue_pause },
 	{ "pollfd",  &cqueue_pollfd },
@@ -2902,6 +2926,7 @@ static const luaL_Reg cqueues_globals[] = {
 	{ "interpose", &cqueue_interpose },
 	{ "monotime",  &cqueue_monotime },
 	{ "cancel",    &cstack_cancel },
+	{ "signal",    &cstack_signal },
 	{ "reset",     &cstack_reset },
 	{ "running",   &cstack_running },
 	{ NULL,        NULL }
