@@ -2409,20 +2409,20 @@ static int cqueue_count(lua_State *L) {
 } /* cqueue_count() */
 
 
-static cqs_error_t cqueue_cancelfd(struct cqueue *Q, int fd) {
+static cqs_error_t cqueue_signalfd(struct cqueue *Q, int fd, int mask) {
 	struct fileno *fileno;
 	int error = 0, _error;
 
 	if (!(fileno = fileno_find(Q, fd)))
 		return 0;
 
-	if ((_error = fileno_signal(Q, fileno, POLLIN|POLLOUT|POLLPRI)))
+	if ((_error = fileno_signal(Q, fileno, mask)))
 		error = _error;
 	if ((_error = fileno_ctl(Q, fileno, 0)))
 		error = _error;
 
 	return error;
-} /* cqueue_cancelfd() */
+} /* cqueue_signalfd() */
 
 
 static int cqueue_checkfd(lua_State *L, struct callinfo *I, int index) {
@@ -2449,7 +2449,7 @@ static int cqueue_cancel(lua_State *L) {
 	int index;
 
 	for (index = 2; index <= top; index++)
-		cqueue_cancelfd(Q, cqueue_checkfd(L, &I, index));
+		cqueue_signalfd(Q, cqueue_checkfd(L, &I, index), -1);
 
 	return 0;
 } /* cqueue_cancel() */
@@ -2761,19 +2761,19 @@ static void cstack_del(struct cqueue *Q) {
 } /* cstack_del() */
 
 
-static void cstack_cancelfd(struct cstack *CS, int fd) {
+static void cstack_signalfd(struct cstack *CS, int fd, int mask) {
 	struct cqueue *Q;
 
 	LIST_FOREACH(Q, &CS->cqueues, le) {
-		cqueue_cancelfd(Q, fd);
+		cqueue_signalfd(Q, fd, mask);
 	}
-} /* cstack_cancelfd() */
+} /* cstack_signalfd() */
 
 
 static void cstack_closefd(struct cstack *CS, int *fd) {
 	/* NB: CS can be NULL. See cqueue_destroy(). */
 	if (CS) {
-		cstack_cancelfd(CS, *fd);
+		cstack_signalfd(CS, *fd, -1);
 	}
 
 	cqs_closefd(fd);
@@ -2795,7 +2795,7 @@ static int cstack_cancel(lua_State *L) {
 
 	for (index = 1; index <= lua_gettop(L); index++) {
 		fd = cqueue_checkfd(L, &I, index);
-		cstack_cancelfd(CS, fd);
+		cstack_signalfd(CS, fd, -1);
 	}
 
 	return 0;
@@ -2803,7 +2803,7 @@ static int cstack_cancel(lua_State *L) {
 
 
 void cqs_cancelfd(lua_State *L, int fd) {
-	cstack_cancelfd(cstack_self(L), fd);
+	cstack_signalfd(cstack_self(L), fd, -1);
 } /* cqs_cancelfd() */
 
 
